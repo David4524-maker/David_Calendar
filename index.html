@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>David Calendar</title>
+<style>
+  /* ============ ESTILO NEOBRUTALISTA ============ */
+  :root {
+    --bg: #ffffff;
+    --text: #000000;
+    --red: #ed1c24;
+    --border-width: 4px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* ============ CONTENEDOR PRINCIPAL ============ */
+  .wrapper {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ============ CABECERA ROJA (PÍLDORA) ============ */
+  .header-pill {
+    background-color: var(--red);
+    color: #ffffff;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 15px 40px;
+    border: var(--border-width) solid #000;
+    border-radius: 60px;
+    z-index: 10;
+    margin-bottom: -15px; /* Efecto de superposición */
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ============ CAJA BLANCA PRINCIPAL ============ */
+  .main-box {
+    background-color: var(--bg);
+    border: var(--border-width) solid #000;
+    width: 100%;
+    padding: 35px 20px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ============ BARRA SUPERIOR (IDIOMA) ============ */
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .lang-selector {
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border: 3px solid #000;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    outline: none;
+    border-radius: 8px;
+    text-transform: uppercase;
+  }
+  
+  .lang-selector:hover {
+    background: #f0f0f0;
+  }
+
+  /* ============ CONTROLES DEL CALENDARIO ============ */
+  .cal-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  .nav-btn {
+    background: #fff;
+    color: #000;
+    border: 3px solid #000;
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+  }
+
+  .nav-btn:hover {
+    background: #000;
+    color: #fff;
+  }
+
+  .select-group {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .select-group select {
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 8px;
+    border: 3px solid #000;
+    border-radius: 8px;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    outline: none;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* ============ DÍAS DE LA SEMANA ============ */
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .weekday {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 5px 0;
+  }
+
+  /* ============ REJILLA DE DÍAS ============ */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+
+  .day:hover {
+    background: #000;
+    color: #fff;
+  }
+
+  .day.other {
+    color: #999;
+    border-color: #ccc;
+  }
+
+  .day.other:hover {
+    background: #999;
+    color: #fff;
+    border-color: #999;
+  }
+
+  .day.today {
+    border-color: var(--red);
+    color: var(--red);
+    border-width: 3px;
+  }
+
+  .day.selected {
+    background: var(--red);
+    color: #fff;
+    border-color: #000;
+  }
+
+  /* ============ PIE DE PÁGINA ============ */
+  .footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 3px solid #000;
+    padding-top: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .selected-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .selected-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .selected-date {
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .today-btn {
+    background: var(--red);
+    color: #fff;
+    border: 3px solid #000;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+
+  .today-btn:hover {
+    background: #000;
+  }
+
+  /* Ajustes Responsive */
+  @media (max-width: 550px) {
+    .header-pill {
+      padding: 10px 20px;
+      font-size: 1.5rem;
+      margin-bottom: -10px;
+    }
+    .main-box {
+      padding: 25px 12px 12px;
+    }
+    .day {
+      font-size: 0.85rem;
+    }
+    .select-group select {
+      font-size: 0.9rem;
+      padding: 6px;
+    }
+    .nav-btn {
+      width: 38px;
+      height: 38px;
+      font-size: 1.2rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <!-- CABECERA ROJA -->
+  <div class="header-pill">DAVID CALENDAR</div>
+
+  <!-- CAJA PRINCIPAL -->
+  <div class="main-box">
+    
+    <!-- BARRA DE IDIOMA -->
+    <div class="top-bar">
+      <span id="langLabel" style="font-weight: 900; text-transform: uppercase; font-size: 0.9rem;">Idioma</span>
+      <select id="langSelect" class="lang-selector"></select>
+    </div>
+
+    <!-- CONTROLES DEL CALENDARIO -->
+    <div class="cal-controls">
+      <button class="nav-btn" id="prevBtn" type="button">‹</button>
+      <div class="select-group">
+        <select id="monthSelect"></select>
+        <select id="yearSelect"></select>
+      </div>
+      <button class="nav-btn" id="nextBtn" type="button">›</button>
+    </div>
+
+    <!-- DÍAS DE LA SEMANA -->
+    <div class="weekdays" id="weekdays"></div>
+
+    <!-- REJILLA DE DÍAS -->
+    <div class="grid" id="grid"></div>
+
+    <!-- PIE DE PÁGINA -->
+    <div class="footer">
+      <div class="selected-info">
+        <span class="selected-label" id="selectedLabel">Seleccionado</span>
+        <span class="selected-date" id="selectedDate">—</span>
+      </div>
+      <button class="today-btn" id="todayBtn" type="button">Hoy</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ IDIOMAS (10) ============ */
+  const LANGS = {
+    es: { label: 'Español', flag: '🇪🇸', locale: 'es-ES', dir: 'ltr', firstDay: 1, language: 'Idioma', today: 'Hoy', selected: 'Seleccionado' },
+    en: { label: 'English', flag: '🇬🇧', locale: 'en-GB', dir: 'ltr', firstDay: 1, language: 'Language', today: 'Today', selected: 'Selected' },
+    fr: { label: 'Français', flag: '🇫🇷', locale: 'fr-FR', dir: 'ltr', firstDay: 1, language: 'Langue', today: "Aujourd'hui", selected: 'Sélectionné' },
+    de: { label: 'Deutsch', flag: '🇩🇪', locale: 'de-DE', dir: 'ltr', firstDay: 1, language: 'Sprache', today: 'Heute', selected: 'Ausgewählt' },
+    it: { label: 'Italiano', flag: '🇮🇹', locale: 'it-IT', dir: 'ltr', firstDay: 1, language: 'Lingua', today: 'Oggi', selected: 'Selezionato' },
+    pt: { label: 'Português', flag: '🇧🇷', locale: 'pt-BR', dir: 'ltr', firstDay: 0, language: 'Idioma', today: 'Hoje', selected: 'Selecionado' },
+    ru: { label: 'Русский', flag: '🇷🇺', locale: 'ru-RU', dir: 'ltr', firstDay: 1, language: 'Язык', today: 'Сегодня', selected: 'Выбрано' },
+    zh: { label: '中文', flag: '🇨🇳', locale: 'zh-CN', dir: 'ltr', firstDay: 0, language: '语言', today: '今天', selected: '已选' },
+    ja: { label: '日本語', flag: '🇯🇵', locale: 'ja-JP', dir: 'ltr', firstDay: 0, language: '言語', today: '今日', selected: '選択' },
+    ar: { label: 'العربية', flag: '🇪🇬', locale: 'ar-EG', dir: 'rtl', firstDay: 6, language: 'اللغة', today: 'اليوم', selected: 'المحدد' }
+  };
+
+  const ORDER = ['es', 'en', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ar'];
+
+  /* ============ ESTADO ============ */
+  const TODAY = new Date();
+  TODAY.setHours(0, 0, 0, 0);
+
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  const savedLang = store.get('david-calendar-lang-brutal');
+
+  const state = {
+    lang: ORDER.indexOf(savedLang) !== -1 ? savedLang : 'es',
+    viewYear: TODAY.getFullYear(),
+    viewMonth: TODAY.getMonth(),
+    selected: new Date(TODAY)
+  };
+
+  /* ============ UTILIDADES ============ */
+  const $ = id => document.getElementById(id);
+  const L = () => LANGS[state.lang];
+  const numFmt = () => new Intl.NumberFormat(L().locale, { useGrouping: false });
+  const cap = s => (s ? s.charAt(0).toLocaleUpperCase(L().locale) + s.slice(1) : s);
+  const sameDay = (a, b) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+
+  /* ============ TEXTOS ============ */
+  function applyStatic() {
+    const l = L();
+    document.documentElement.lang = state.lang;
+    document.documentElement.dir = l.dir;
+
+    $('langLabel').textContent = l.language;
+    $('todayBtn').textContent = l.today;
+    $('selectedLabel').textContent = l.selected;
+  }
+
+  /* ============ SELECTOR DE IDIOMA ============ */
+  function fillLangSelect() {
+    const sel = $('langSelect');
+    sel.innerHTML = '';
+    ORDER.forEach(code => {
+      const opt = document.createElement('option');
+      opt.value = code;
+      opt.textContent = LANGS[code].flag + ' ' + LANGS[code].label;
+      sel.appendChild(opt);
+    });
+    sel.value = state.lang;
+  }
+
+  /* ============ SELECTORES MES / AÑO ============ */
+  function fillSelects() {
+    const l = L();
+    const nf = numFmt();
+    const monthFmt = new Intl.DateTimeFormat(l.locale, { month: 'long' });
+
+    const ms = $('monthSelect');
+    ms.innerHTML = '';
+    for (let m = 0; m < 12; m++) {
+      const opt = document.createElement('option');
+      opt.value = String(m);
+      opt.textContent = cap(monthFmt.format(new Date(2021, m, 1)));
+      ms.appendChild(opt);
+    }
+
+    const ys = $('yearSelect');
+    ys.innerHTML = '';
+    const base = TODAY.getFullYear();
+    for (let y = base - 80; y <= base + 50; y++) {
+      const opt = document.createElement('option');
+      opt.value = String(y);
+      opt.textContent = nf.format(y);
+      ys.appendChild(opt);
+    }
+  }
+
+  /* ============ RENDERIZAR CALENDARIO ============ */
+  function renderCalendar() {
+    const l = L();
+    const nf = numFmt();
+    const dayFmt = new Intl.DateTimeFormat(l.locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    $('monthSelect').value = String(state.viewMonth);
+    $('yearSelect').value = String(state.viewYear);
+
+    // Días de la semana
+    const wf = new Intl.DateTimeFormat(l.locale, { weekday: 'short' });
+    const weekdays = $('weekdays');
+    weekdays.innerHTML = '';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(2021, 7, 1 + ((l.firstDay + i) % 7));
+      const cell = document.createElement('div');
+      cell.className = 'weekday';
+      cell.textContent = wf.format(d);
+      weekdays.appendChild(cell);
+    }
+
+    // Días del mes
+    const firstOfMonth = new Date(state.viewYear, state.viewMonth, 1);
+    const offset = (firstOfMonth.getDay() - l.firstDay + 7) % 7;
+    const daysInMonth = new Date(state.viewYear, state.viewMonth + 1, 0).getDate();
+    const totalCells = Math.ceil((offset + daysInMonth) / 7) * 7;
+
+    const grid = $('grid');
+    grid.innerHTML = '';
+    const frag = document.createDocumentFragment();
+
+    for (let i = 0; i < totalCells; i++) {
+      const d = new Date(state.viewYear, state.viewMonth, 1 - offset + i);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'day';
+      
+      if (d.getMonth() !== state.viewMonth) btn.classList.add('other');
+      if (sameDay(d, TODAY)) btn.classList.add('today');
+      if (sameDay(d, state.selected)) btn.classList.add('selected');
+      
+      btn.textContent = nf.format(d.getDate());
+      btn.setAttribute('aria-label', dayFmt.format(d));
+      btn.addEventListener('click', () => selectDate(d));
+      
+      frag.appendChild(btn);
+    }
+
+    grid.appendChild(frag);
+    $('selectedDate').textContent = dayFmt.format(state.selected);
+  }
+
+  /* ============ ACCIONES ============ */
+  function selectDate(d) {
+    state.selected = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (d.getMonth() !== state.viewMonth || d.getFullYear() !== state.viewYear) {
+      state.viewMonth = d.getMonth();
+      state.viewYear = d.getFullYear();
+    }
+    renderCalendar();
+  }
+
+  function shiftMonth(delta) {
+    const d = new Date(state.viewYear, state.viewMonth + delta, 1);
+    state.viewYear = d.getFullYear();
+    state.viewMonth = d.getMonth();
+    renderCalendar();
+  }
+
+  function goToday() {
+    state.viewYear = TODAY.getFullYear();
+    state.viewMonth = TODAY.getMonth();
+    state.selected = new Date(TODAY);
+    renderCalendar();
+  }
+
+  /* ============ EVENTOS ============ */
+  $('langSelect').addEventListener('change', function () {
+    state.lang = this.value;
+    store.set('david-calendar-lang-brutal', state.lang);
+    applyStatic();
+    fillSelects();
+    renderCalendar();
+  });
+
+  $('monthSelect').addEventListener('change', function () {
+    state.viewMonth = parseInt(this.value, 10);
+    renderCalendar();
+  });
+
+  $('yearSelect').addEventListener('change', function () {
+    state.viewYear = parseInt(this.value, 10);
+    renderCalendar();
+  });
+
+  $('prevBtn').addEventListener('click', () => shiftMonth(-1));
+  $('nextBtn').addEventListener('click', () => shiftMonth(1));
+  $('todayBtn').addEventListener('click', goToday);
+
+  /* ============ ARRANQUE ============ */
+  fillLangSelect();
+  applyStatic();
+  fillSelects();
+  renderCalendar();
+
+})();
+</script>
+</body>
+</html>
